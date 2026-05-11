@@ -16,6 +16,30 @@ def attention(X, W_Q, W_K, W_V):
 
     attention_weights = softmax(scaled_down_Q_K)
 
-    output = np.matmul(attention_weights, input_to_value)
+    att_output = np.matmul(attention_weights, input_to_value)
 
-    return output
+    return att_output
+
+def feed_forward(X, W1, W2):
+    result = np.maximum(0, np.matmul(X, W1))
+    ff_output = np.matmul(result, W2) 
+    return ff_output
+
+def layer_norm(X):
+    ln_output = (X - np.mean(X, axis=1, keepdims=True)) / (np.std(X, axis=1, keepdims=True) + 1e-6)
+    return ln_output
+
+def transformer_block(X, W1, W2, W_Q, W_K, W_V):
+    X = layer_norm(X + attention(X, W_Q, W_K, W_V))
+    X = layer_norm(X + feed_forward(X, W1, W2))
+    return X
+
+X = np.random.randn(4, 8)
+W_Q = np.random.randn(8, 8)
+W_K = np.random.randn(8, 8)
+W_V = np.random.randn(8, 8)
+
+W1 = np.random.randn(8, 32)
+W2 = np.random.randn(32, 8)
+
+print(transformer_block(X, W1, W2, W_Q, W_K, W_V))
