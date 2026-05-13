@@ -22,9 +22,34 @@ class TinyTransformer(nn.Module):
         x = x.squeeze(1)
         x = self.output_proj(x)
         return x
-    
-tensor = torch.randint(0, 27, (4,))
+
+text = "hello world"
+chars = sorted(set(text))
+vocab_size = len(chars)
+char_to_idx = {c: i for i, c in enumerate(chars)}
+token_dict = torch.tensor([char_to_idx[c] for c in text])
+
+x_train = token_dict[:-1]
+y_train = token_dict[1:]
 
 model = TinyTransformer()
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
-print(model(tensor))
+for epoch in range(500):
+    logits = model(x_train)
+    loss = criterion(logits, y_train)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    if epoch % 50 == 0:
+        print(f"epoch {epoch}, loss: {loss.item():.4f}")
+
+model.eval()
+with torch.no_grad():
+    logits = model(x_train)
+    predictions = torch.argmax(logits, dim=1)
+    idx_to_char = {i: c for c, i in char_to_idx.items()}
+    predicted_text = ''.join([idx_to_char[i.item()] for i in predictions])
+    print("input:    ", text[:-1])
+    print("predicted:", predicted_text)
