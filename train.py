@@ -14,9 +14,12 @@ class TinyTransformer(nn.Module):
         self.norm1 = nn.LayerNorm(8)
         self.norm2 = nn.LayerNorm(8)
         self.output_proj = nn.Linear(8, 27)
+        self.pos_embedding = nn.Embedding(10, 8)
     
     def forward(self, x):
-        x = self.embedding(x).unsqueeze(1)
+        x = self.embedding(x)
+        positions = torch.arange(x.shape[0])
+        x = (x + self.pos_embedding(positions)).unsqueeze(1)
         x = self.norm1(x + self.attention(x, x, x)[0])
         x = self.norm2(x + self.ff(x))
         x = x.squeeze(1)

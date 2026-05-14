@@ -41,17 +41,3 @@ def multihead_attention(X, heads, W_0):
     conc_results = np.concatenate(h_results, axis=1)
     mlt_att_output = np.matmul(conc_results, W_0)
     return mlt_att_output
-
-X = np.random.randn(4, 8)
-heads = [
-    (np.random.randn(8, 8), np.random.randn(8, 8), np.random.randn(8, 8)),
-    (np.random.randn(8, 8), np.random.randn(8, 8), np.random.randn(8, 8)),
-    (np.random.randn(8, 8), np.random.randn(8, 8), np.random.randn(8, 8)),
-    (np.random.randn(8, 8), np.random.randn(8, 8), np.random.randn(8, 8)),
-]
-W_0 = np.random.randn(32, 8)
-
-W1 = np.random.randn(8, 32)
-W2 = np.random.randn(32, 8)
-
-print(transformer_block(X, W_0, W1, W2, heads))
